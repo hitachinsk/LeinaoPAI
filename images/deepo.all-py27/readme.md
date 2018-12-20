@@ -7,4 +7,4 @@ and their Dockerfile generator that
 allows you to customize your own environment with Lego-like modules
 automatically resolves the dependencies for you
 
-version:python2.7
+version:  python2.7
