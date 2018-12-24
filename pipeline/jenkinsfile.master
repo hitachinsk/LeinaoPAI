@@ -2,7 +2,7 @@
 pipeline {
     agent any
 	environment{
-        EMAIL_LIST='sangjing@leinao.ai,junkai@leinao.ai'
+        EMAIL_LIST='sangjing@leinao.ai,yuliang@leinao.ai'
     }
 	options {
         timeout(time: 12, unit: 'HOURS')
