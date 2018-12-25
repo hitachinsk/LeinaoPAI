@@ -23,7 +23,7 @@ pipeline {
             steps {
                 dir('pipeline'){
                     script {
-                        docker.withRegistry('http://10.12.4.26:5000') {
+                         withDockerRegistry(credentialsId: '55c571e1-477a-4a75-9933-53c798a0cc16', url: 'http://10.11.3.8:5000/') {
                             sh 'git log -3 --name-only -- | grep images | grep Dockerfile | awk -F \'/\' \'{print$2}\' | awk \'!a[$0]++\' > temp/CHANGE_DIR_original'
                             sh 'echo "最近用户镜像目录：`cat ${WORKSPACE}/pipeline/temp/CHANGE_DIR_original`"'
                             def CHANGE_DIR_original = readFile("${WORKSPACE}/pipeline/temp/CHANGE_DIR_original").split("\r?\n").each {}
