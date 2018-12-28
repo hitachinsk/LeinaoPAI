@@ -24,7 +24,7 @@ RUN curl -o ~/conda.sh -O  https://repo.continuum.io/archive/Anaconda3-5.1.0-Lin
     /opt/conda3/bin/conda clean -ya 
     
 
-ENV PATH /opt/conda/bin:$PATH
+ENV PATH /opt/conda3/bin:$PATH
 ENV LD_LIBRARY_PATH /usr/lib/x86_64-linux-gnu:/usr/local/cuda-9.2/lib64:$LD_LIBRARY_PATH
 
 RUN pip install --no-cache-dir wheel  setuptools
