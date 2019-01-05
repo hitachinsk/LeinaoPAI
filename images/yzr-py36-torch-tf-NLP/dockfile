@@ -7,7 +7,7 @@ ENV LC_ALL=C
 RUN pip install --upgrade pip
 
 RUN pip install pytz==2017.3 \
-            nump==1.15.4 \
+            numpy==1.15.4 \
             pandas \
             msgpack-python \
             spacy \
