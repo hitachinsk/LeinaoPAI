@@ -6,13 +6,9 @@ ENV LC_ALL=C
 
 RUN pip install --upgrade pip
 
-RUN pip install numpy \
+RUN pip install pytz==2017.3 \
+            numpy==1.15.4 \
             pandas \
             msgpack-python \
             spacy \
-            allennlp \
-            numpy
-
-RUN pip install torch
-
-Run pip install tensorflow-gpu
+            allennlp
