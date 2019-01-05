@@ -20,7 +20,7 @@ spacy 2.0.18
 allennlp 0.8.0
 
 ### pip包
-pip list
+
 Package                  Version               
 ------------------------ ----------------------
 absl-py                  0.2.2                 
