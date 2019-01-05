@@ -10,9 +10,8 @@ RUN pip install numpy \
             pandas \
             msgpack-python \
             spacy \
-            allennlp \
-            numpy
+            allennlp
 
-RUN pip install torch
+RUN pip install numpy==1.15.4
 
-Run pip install tensorflow-gpu
+RUN pip install pytz==2017.3
