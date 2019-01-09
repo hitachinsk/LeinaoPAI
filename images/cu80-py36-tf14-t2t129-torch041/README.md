@@ -23,7 +23,7 @@ deepdish               0.3.6
 dominate               2.3.5                 
 enum34                 1.1.6                 
 fasteners              0.14.1                
-fjcommon               0.1.69                
+fjcommon               0.2.5                 
 future                 0.17.1                
 h5py                   2.9.0                 
 html5lib               0.9999999             
@@ -40,7 +40,7 @@ monotonic              1.5
 mpmath                 1.1.0                 
 networkx               2.2                   
 nose                   1.3.7                 
-numba                  0.41.0                
+numba                  0.42.0                
 numexpr                2.6.9                 
 numpy                  1.15.4                
 opencv-python          3.4.5.20              
