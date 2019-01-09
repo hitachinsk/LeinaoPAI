@@ -1,6 +1,6 @@
 # ==================================================================
 # cu80-py36-tf14-t2t129-torch041
-# maintrainer: Tianyu He (deeptimhe@outlook.com)
+# maintrainer: Tianyu He (tim-he@qq.com)
 # ------------------------------------------------------------------
 # python        3.6    (apt)
 # tensorflow    1.4.0  (pip)
@@ -14,7 +14,7 @@ FROM nvidia/cuda:8.0-cudnn6-devel-ubuntu16.04
 ENV LD_LIBRARY_PATH=/usr/local/cuda/lib64:/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH PATH=/usr/local/cuda-8.0/bin:$PATH
 ENV LC_ALL=C
 
-RUN sed -i 's/archive.ubuntu.com/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
+RUN	sed -i 's/archive.ubuntu.com/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
     APT_INSTALL="apt-get install -y --no-install-recommends" && \
     PIP_INSTALL="python -m pip --no-cache-dir install --upgrade -i https://pypi.tuna.tsinghua.edu.cn/simple " && \
     rm -rf /var/lib/apt/lists/* \
@@ -93,7 +93,7 @@ RUN sed -i 's/archive.ubuntu.com/mirrors.ustc.edu.cn/g' /etc/apt/sources.list &&
         leveldb \
         Pillow \
         six \
-        decorator==4.3.0 \
+        decorator \
         opencv-python \
         sklearn \
         imageio \
@@ -101,11 +101,11 @@ RUN sed -i 's/archive.ubuntu.com/mirrors.ustc.edu.cn/g' /etc/apt/sources.list &&
         tqdm \
         cffi \
         urllib3 \
-        numba==0.41.0 \
-        seaborn==0.9.0 \
-        hypertools==0.5.1 \
+        numba \
+        seaborn \
+        hypertools \
         fasteners \
-        fjcommon==0.1.69 \
+        fjcommon \
         && \
 # ==================================================================
 # tensorflow 1.4.0
@@ -126,8 +126,8 @@ RUN sed -i 's/archive.ubuntu.com/mirrors.ustc.edu.cn/g' /etc/apt/sources.list &&
 # ==================================================================
 # nccl
 # ------------------------------------------------------------------
-WORKDIR /opt
-RUN git clone https://github.com/NVIDIA/nccl.git && cd nccl && make -j install && cd .. && rm -rf nccl
+WORKDIR	/opt
+RUN	git clone https://github.com/NVIDIA/nccl.git && cd nccl && make -j install && cd .. && rm -rf nccl
 WORKDIR /
 
 # ==================================================================
