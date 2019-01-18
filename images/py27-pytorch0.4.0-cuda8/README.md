@@ -109,12 +109,4 @@ zope.interface (4.5.0)
 ```
 
 
-### 使用说明
-```shell
-docker pull liuboss/dlcvimg:py2735-tensorflow-torch
-```
 
-
-* * *
-
-如有其他疑问联系本人：liuchuanbin1992@gmail.com
