@@ -16,10 +16,6 @@ ENV LC_ALL=C
 ENV LANG=en_US.UTF8
 ENV LESSCHARSET=UTF-8
 ENV PYTHONIOENCODING=UTF-8
-echo "set encoding=utf-8" >> ~/.vimrc
-echo "set fileencodings=ucs-bom,utf-8,cp936" >> ~/.vimrc
-echo "set fileencoding=utf-8" >> ~/.vimrc
-echo "set termencoding=utf-8" >> ~/.vimrc
 
 RUN sed -i 's/archive.ubuntu.com/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
     APT_INSTALL="apt-get install -y --no-install-recommends" && \
@@ -113,6 +109,7 @@ RUN sed -i 's/archive.ubuntu.com/mirrors.ustc.edu.cn/g' /etc/apt/sources.list &&
         hypertools \
         fasteners \
         fjcommon \
+        sacrebleu==1.2.17 \
         && \
 # ==================================================================
 # tensorflow 1.4.0
