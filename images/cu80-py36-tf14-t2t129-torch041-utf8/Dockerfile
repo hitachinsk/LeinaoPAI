@@ -21,7 +21,7 @@ echo "set fileencodings=ucs-bom,utf-8,cp936" >> ~/.vimrc
 echo "set fileencoding=utf-8" >> ~/.vimrc
 echo "set termencoding=utf-8" >> ~/.vimrc
 
-RUN	sed -i 's/archive.ubuntu.com/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
+RUN sed -i 's/archive.ubuntu.com/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
     APT_INSTALL="apt-get install -y --no-install-recommends" && \
     PIP_INSTALL="python -m pip --no-cache-dir install --upgrade -i https://pypi.tuna.tsinghua.edu.cn/simple " && \
     rm -rf /var/lib/apt/lists/* \
