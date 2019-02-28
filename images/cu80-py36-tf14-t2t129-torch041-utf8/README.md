@@ -61,6 +61,7 @@ pytz                   2018.9
 PyWavelets             1.0.1                 
 pyzmq                  17.1.2                
 requests               2.21.0                
+sacrebleu              1.2.17                
 scikit-image           0.14.1                
 scikit-learn           0.20.2                
 scikit-video           1.1.11                
