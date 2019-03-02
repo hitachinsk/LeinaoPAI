@@ -6,8 +6,8 @@
 # pytorch       1.0    (pip)
 # ==================================================================
 
-# FROM 10.11.3.8:5000/user-images/py2735-pytorch0.4.0
-FROM test:latest
+FROM 10.11.3.8:5000/user-images/py2735-pytorch0.4.0
+# FROM test:latest
 
 ENV LD_LIBRARY_PATH=/usr/local/cuda/lib64:/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH PATH=/usr/local/cuda-8.0/bin:$PATH
 ENV LC_ALL=C
