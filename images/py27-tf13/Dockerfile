@@ -42,9 +42,9 @@ RUN python -m pip uninstall -y torch torchvision
 RUN pip2 install torch torchvision 
 
 # neural renderer
-RUN git clone https://github.com/weigq/neural_renderer-1 && \
-    cd neural_renderer-1 && \ 
-    python setup.py install
+# RUN git clone https://github.com/weigq/neural_renderer-1 && \
+#     cd neural_renderer-1 && \ 
+#     python setup.py install
 
 # ==================================================================
 # config & cleanup
