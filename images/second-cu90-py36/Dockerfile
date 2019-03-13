@@ -27,6 +27,7 @@ RUN APT_INSTALL="apt-get install -y --no-install-recommends" && \
         vim \
         fish \
         libsparsehash-dev \
+	ssh\
         && \
 # ==================================================================
 # python
