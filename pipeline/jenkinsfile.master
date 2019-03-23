@@ -1,0 +1,134 @@
+#!groovy
+pipeline {
+    agent any
+	environment{
+        EMAIL_LIST='sangjing@leinao.ai,yuliang@leinao.ai'
+    }
+	options {
+        timeout(time: 12, unit: 'HOURS')
+		buildDiscarder(logRotator(numToKeepStr: '30'))
+    }
+    stages {
+		stage('代码检查') {
+            steps {
+				echo '最近三次提交的版本中Dockerfile的更新如下：'
+				sh 'echo "`git log -3 --stat --name-only | grep images | grep Dockerfile`"'
+				echo "文件路径：${WORKSPACE}"
+				echo "用户镜像存储路径：${JOB_BASE_NAME}/images"
+				sh 'mkdir ${WORKSPACE}/pipeline/temp'
+			}
+        }
+
+		stage('镜像编译并上传至仓库') {
+            steps {
+                dir('pipeline'){
+                    script {
+                         withDockerRegistry(credentialsId: '55c571e1-477a-4a75-9933-53c798a0cc16', url: 'http://10.11.3.8:5000/') {
+                            sh 'git log -3 --name-only -- | grep images | grep Dockerfile | awk -F \'/\' \'{print$2}\' | awk \'!a[$0]++\' > temp/CHANGE_DIR_original'
+                            sh 'echo "最近用户镜像目录：`cat ${WORKSPACE}/pipeline/temp/CHANGE_DIR_original`"'
+                            def CHANGE_DIR_original = readFile("${WORKSPACE}/pipeline/temp/CHANGE_DIR_original").split("\r?\n").each {}
+                            echo "本次用户镜像目录：${CHANGE_DIR_original[0]}"
+                            echo "列表数量：${CHANGE_DIR_original.size()}"
+                            sh 'git log -3 --name-only -- | grep images | grep Dockerfile | awk -F \'/\' \'{print$2}\' | awk \'!a[$0]++\' | tr \'A-Z\' \'a-z\' > temp/CHANGE_DIR_lowercase'
+                            def CHANGE_DIR_lowercase = readFile("${WORKSPACE}/pipeline/temp/CHANGE_DIR_lowercase").split("\r?\n").each {}
+                            if ("${CHANGE_DIR_original}" != '[]'){
+                                for ( int dockerfile_num = 0; dockerfile_num < CHANGE_DIR_original.size(); ++dockerfile_num ){
+                                    def imageName = "10.12.4.26:5000/user-images/${CHANGE_DIR_lowercase[0]}:${BUILD_NUMBER}"
+                                    dir("${WORKSPACE}/images/${CHANGE_DIR_original[dockerfile_num]}"){
+                                        sh 'cat Dockerfile | grep MAINTAINER | awk \'{print $2}\' > ${WORKSPACE}/pipeline/temp/PROVIDER'
+                                        sh 'echo "镜像制作人：`cat ${WORKSPACE}/pipeline/temp/PROVIDER`"'
+                                        catchError {
+                                            echo "循环次数：${dockerfile_num+1}"
+                                            echo "路径：${CHANGE_DIR_original[dockerfile_num]}"
+                                            sh 'rename -v `ls | grep -i readme.md` readme.md `ls | grep -i readme.md`'
+                                        }
+                                        if (fileExists ('readme.md')){
+                                            echo "发现readme文件"
+                                            sh 'cat `ls | grep -i readme.md` | head -3 | awk \'{{printf"%s,",$0}}\' > ${WORKSPACE}/pipeline/temp/DESCRIPTION'
+                                            sh 'sed -i "/./{s/^/\'/;s/$/\'/}" ${WORKSPACE}/pipeline/temp/DESCRIPTION'
+                                        }else{
+                                            def PROVIDER = readFile("${WORKSPACE}/pipeline/temp/PROVIDER").split("\r?\n").each{}
+                                            emailext body: '${SCRIPT,template="Providers-Notification.template"}', recipientProviders: [[$class: 'DevelopersRecipientProvider']], subject: '缺少Readme文件！ $DEFAULT_SUBJECT', to:"${PROVIDER[0]}"
+                                            error '缺少Readme文件'
+                                       }
+                                        def dockerFile = "-f Dockerfile ."
+                                        docker.build(imageName,dockerFile).push()
+                                        echo "============================================产生${dockerfile_num+1}个新镜像，镜像名称：${imageName}============================================"
+                                    }
+                                    dir("${WORKSPACE}/pipeline"){
+                                        echo '更新数据库中.....................................................'
+                                            script {
+                                                def PROVIDER = readFile("${WORKSPACE}/pipeline/temp/PROVIDER").split("\r?\n").each{}
+                                                def DESCRIPTION = readFile("${WORKSPACE}/pipeline/temp/DESCRIPTION").split("\r?\n").each{}
+                                                echo "镜像描述：${DESCRIPTION}"
+                                                sh "python update_mysql.py ${imageName} ${PROVIDER[0]} ${DESCRIPTION}"
+                                            }
+                                        echo '..................................................数据库更新完毕！'
+                                    }
+                                }
+                            }
+                            else{
+                                error '本次更新无镜像产生，原因：无Dockerfile更新'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+		stage('更新数据库') {
+            steps {
+				echo '------------------------------------------所有数据库更新完毕------------------------------------------'
+			}
+        }
+    }
+
+	post {
+	   	always {
+			echo '流水线已停止，'
+        }
+        changed{
+			echo '流水线状态已改变'
+		}
+		unstable{
+			echo '流水线不稳定'
+		}
+		failure{
+   			echo '流水线失败'
+            script {
+                def CHANGE_DIR_original = readFile("${WORKSPACE}/pipeline/temp/CHANGE_DIR_original").split("\r?\n").each {}
+                if ("${CHANGE_DIR_original}" != '[]'){
+                    if (fileExists ('${WORKSPACE}/pipeline/temp/PROVIDER')){
+                        def PROVIDER = readFile("${WORKSPACE}/pipeline/temp/PROVIDER").split("\r?\n").each{}
+                        emailext body: '$DEFAULT_CONTENT', subject: '失败！ $DEFAULT_SUBJECT', to: "${PROVIDER[0]}"
+                    }
+                    emailext body: '$DEFAULT_CONTENT', subject: '失败！ $DEFAULT_SUBJECT', to: "${EMAIL_LIST}"
+                }
+                else{
+                    emailext body: '$DEFAULT_CONTENT', subject: '本次更新无镜像产生，无Dockerfile更新 $DEFAULT_SUBJECT', to: "${EMAIL_LIST}"
+                }
+            }
+   		}
+   		success{
+   			echo '流水线成功'
+   			emailext body: '$DEFAULT_CONTENT', subject: '恭喜！ $PROJECT_NAME - Build # $BUILD_NUMBER - 构建成功!', to: "${EMAIL_LIST}"
+            script {
+                def PROVIDER = readFile("${WORKSPACE}/pipeline/temp/PROVIDER").split("\r?\n").each{}
+                emailext body: '$DEFAULT_CONTENT', subject: '恭喜！ $DEFAULT_SUBJECT', to: "${PROVIDER[0]}"
+            }
+   		}
+   		aborted{
+   			echo '流水线已被用户终止'
+   			emailext body: '$DEFAULT_CONTENT', subject: '已终止！ $DEFAULT_SUBJECT', to: "${EMAIL_LIST}"
+            script {
+                def PROVIDER = readFile("${WORKSPACE}/pipeline/temp/PROVIDER").split("\r?\n").each {}
+                emailext body: '$DEFAULT_CONTENT', subject: '已终止！ $DEFAULT_SUBJECT', to: "${PROVIDER[0]}"
+            }
+   		}
+        cleanup {
+            echo '开始清理临时文件'
+            sh 'rm -rf ${WORKSPACE}/pipeline/temp/'
+            sh 'git clean -df'
+        }
+    }
+}
